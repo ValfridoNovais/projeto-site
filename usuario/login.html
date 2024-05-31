@@ -4,9 +4,8 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Login e Registro</title>
-    <!-- Bootstrap CSS -->
     <link href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
-    <link rel="stylesheet" href="../Estilo/style.css">
+    <link rel="stylesheet" href="style.css">
 </head>
 <body>
     <div class="container mt-5">
@@ -55,7 +54,31 @@
     <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.9.2/dist/umd/popper.min.js"></script>
     <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+    <!-- CryptoJS Library -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/crypto-js/4.0.0/crypto-js.min.js"></script>
     <script>
+        const DB_NAME = 'UserDatabase';
+        const DB_VERSION = 1;
+        let db;
+
+        document.addEventListener('DOMContentLoaded', () => {
+            let request = indexedDB.open(DB_NAME, DB_VERSION);
+
+            request.onupgradeneeded = function(event) {
+                db = event.target.result;
+                let objectStore = db.createObjectStore('users', { keyPath: 'username' });
+                objectStore.createIndex('email', 'email', { unique: true });
+            };
+
+            request.onsuccess = function(event) {
+                db = event.target.result;
+            };
+
+            request.onerror = function(event) {
+                console.error('Database error:', event.target.errorCode);
+            };
+        });
+
         document.getElementById('show-register').addEventListener('click', function(event) {
             event.preventDefault();
             document.getElementById('login-form').classList.add('d-none');
@@ -70,6 +93,57 @@
             document.getElementById('register-form').classList.add('d-none');
             document.getElementById('show-register').classList.remove('d-none');
             document.getElementById('show-login').classList.add('d-none');
+        });
+
+        document.getElementById('register-form').addEventListener('submit', function(event) {
+            event.preventDefault();
+            const username = document.getElementById('register-username').value;
+            const password = document.getElementById('register-password').value;
+            const email = document.getElementById('register-email').value;
+
+            const hashedPassword = CryptoJS.SHA256(password).toString();
+
+            let transaction = db.transaction(['users'], 'readwrite');
+            let objectStore = transaction.objectStore('users');
+
+            let request = objectStore.add({ username, password: hashedPassword, email });
+
+            request.onsuccess = function(event) {
+                alert('Usuário registrado com sucesso!');
+                document.getElementById('show-login').click();
+            };
+
+            request.onerror = function(event) {
+                alert('Erro ao registrar usuário. Talvez o nome de usuário ou email já exista.');
+                console.error('Error:', event.target.errorCode);
+            };
+        });
+
+        document.getElementById('login-form').addEventListener('submit', function(event) {
+            event.preventDefault();
+            const username = document.getElementById('login-username').value;
+            const password = document.getElementById('login-password').value;
+            const hashedPassword = CryptoJS.SHA256(password).toString();
+
+            let transaction = db.transaction(['users']);
+            let objectStore = transaction.objectStore('users');
+            let request = objectStore.get(username);
+
+            request.onsuccess = function(event) {
+                if (event.target.result) {
+                    if (event.target.result.password === hashedPassword) {
+                        alert('Login bem-sucedido!');
+                    } else {
+                        alert('Senha incorreta!');
+                    }
+                } else {
+                    alert('Usuário não encontrado!');
+                }
+            };
+
+            request.onerror = function(event) {
+                console.error('Error:', event.target.errorCode);
+            };
         });
     </script>
 </body>
