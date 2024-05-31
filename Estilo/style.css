@@ -42,3 +42,6 @@ a:hover {
     color: rgb(32, 20, 199);
 }
 
+.card {
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+}
