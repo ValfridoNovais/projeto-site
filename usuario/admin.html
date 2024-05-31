@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin - Lista de Usuários</title>
+    <link href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
+</head>
+<body>
+    <div class="container mt-5">
+        <h2 class="text-center">Lista de Usuários</h2>
+        <table class="table table-bordered">
+            <thead>
+                <tr>
+                    <th>Nome Completo</th>
+                    <th>Número Polícia</th>
+                    <th>Posto/Graduação</th>
+                    <th>Cia PM</th>
+                </tr>
+            </thead>
+            <tbody id="user-list">
+            </tbody>
+        </table>
+    </div>
+    <script>
+        const DB_NAME = 'UserDatabase';
+        const DB_VERSION = 1;
+        let db;
+
+        document.addEventListener('DOMContentLoaded', () => {
+            let request = indexedDB.open(DB_NAME, DB_VERSION);
+
+            request.onsuccess = function(event) {
+                db = event.target.result;
+                loadUsers();
+            };
+
+            request.onerror = function(event) {
+                console.error('Database error:', event.target.errorCode);
+            };
+        });
+
+        function loadUsers() {
+            let transaction = db.transaction(['users']);
+            let objectStore = transaction.objectStore('users');
+            let request = objectStore.getAll();
+
+            request.onsuccess = function(event) {
+                const users = event.target.result;
+                const userList = document.getElementById('user-list');
+
+                users.forEach(user => {
+                    let row = userList.insertRow();
+                    row.insertCell(0).textContent = user.fullname;
+                    row.insertCell(1).textContent = user.username;
+                    row.insertCell(2).textContent = user.rank;
+                    row.insertCell(3).textContent = user.cia;
+                });
+            };
+
+            request.onerror = function(event) {
+                console.error('Error:', event.target.errorCode);
+            };
+        }
+    </script>
+</body>
+</html>

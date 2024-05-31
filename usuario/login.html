@@ -16,7 +16,7 @@
                         <form id="login-form" class="form">
                             <h2 class="card-title text-center">Login</h2>
                             <div class="form-group">
-                                <label for="login-username">Usuário</label>
+                                <label for="login-username">Número Polícia</label>
                                 <input type="text" class="form-control" id="login-username" name="username" required>
                             </div>
                             <div class="form-group">
@@ -28,16 +28,45 @@
                         <form id="register-form" class="form d-none">
                             <h2 class="card-title text-center">Registro</h2>
                             <div class="form-group">
-                                <label for="register-username">Usuário</label>
+                                <label for="register-fullname">Nome Completo</label>
+                                <input type="text" class="form-control" id="register-fullname" name="fullname" required>
+                            </div>
+                            <div class="form-group">
+                                <label for="register-username">Número Polícia</label>
                                 <input type="text" class="form-control" id="register-username" name="username" required>
+                            </div>
+                            <div class="form-group">
+                                <label for="register-rank">Posto/Graduação</label>
+                                <select class="form-control" id="register-rank" name="rank" required>
+                                    <option value="Cel PM">Cel PM</option>
+                                    <option value="Ten Cel PM">Ten Cel PM</option>
+                                    <option value="Maj PM">Maj PM</option>
+                                    <option value="Cap PM">Cap PM</option>
+                                    <option value="1º Ten PM">1º Ten PM</option>
+                                    <option value="2º Ten PM">2º Ten PM</option>
+                                    <option value="Asp OF PM">Asp OF PM</option>
+                                    <option value="Sub Ten PM">Sub Ten PM</option>
+                                    <option value="1º Sgt PM">1º Sgt PM</option>
+                                    <option value="2º Sgt PM">2º Sgt PM</option>
+                                    <option value="3º Sgt PM">3º Sgt PM</option>
+                                    <option value="Cb PM">Cb PM</option>
+                                    <option value="Sd PM">Sd PM</option>
+                                </select>
+                            </div>
+                            <div class="form-group">
+                                <label for="register-cia">Cia PM</label>
+                                <select class="form-control" id="register-cia" name="cia" required>
+                                    <option value="42º CIA PM">42º CIA PM</option>
+                                    <option value="47º CIA PM">47º CIA PM</option>
+                                    <option value="155º CIA PM">155º CIA PM</option>
+                                    <option value="232º CIA PM">232º CIA PM</option>
+                                    <option value="74º CIA TM">74º CIA TM</option>
+                                    <option value="Outras">Outras</option>
+                                </select>
                             </div>
                             <div class="form-group">
                                 <label for="register-password">Senha</label>
                                 <input type="password" class="form-control" id="register-password" name="password" required>
-                            </div>
-                            <div class="form-group">
-                                <label for="register-email">Email</label>
-                                <input type="email" class="form-control" id="register-email" name="email" required>
                             </div>
                             <button type="submit" class="btn btn-primary btn-block">Registrar</button>
                         </form>
@@ -50,11 +79,9 @@
             </div>
         </div>
     </div>
-    <!-- Bootstrap JS, Popper.js, and jQuery -->
     <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.9.2/dist/umd/popper.min.js"></script>
     <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
-    <!-- CryptoJS Library -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/crypto-js/4.0.0/crypto-js.min.js"></script>
     <script>
         const DB_NAME = 'UserDatabase';
@@ -97,16 +124,18 @@
 
         document.getElementById('register-form').addEventListener('submit', function(event) {
             event.preventDefault();
+            const fullname = document.getElementById('register-fullname').value;
             const username = document.getElementById('register-username').value;
             const password = document.getElementById('register-password').value;
-            const email = document.getElementById('register-email').value;
+            const rank = document.getElementById('register-rank').value;
+            const cia = document.getElementById('register-cia').value;
 
             const hashedPassword = CryptoJS.SHA256(password).toString();
 
             let transaction = db.transaction(['users'], 'readwrite');
             let objectStore = transaction.objectStore('users');
 
-            let request = objectStore.add({ username, password: hashedPassword, email });
+            let request = objectStore.add({ fullname, username, password: hashedPassword, rank, cia });
 
             request.onsuccess = function(event) {
                 alert('Usuário registrado com sucesso!');
@@ -114,7 +143,7 @@
             };
 
             request.onerror = function(event) {
-                alert('Erro ao registrar usuário. Talvez o nome de usuário ou email já exista.');
+                alert('Erro ao registrar usuário. Talvez o número da polícia já exista.');
                 console.error('Error:', event.target.errorCode);
             };
         });
@@ -133,6 +162,12 @@
                 if (event.target.result) {
                     if (event.target.result.password === hashedPassword) {
                         alert('Login bem-sucedido!');
+                        // Redirecionar para uma página de usuário ou administrador
+                        if (username === 'admin') {
+                            window.location.href = 'admin.html';
+                        } else {
+                            alert('Bem-vindo, ' + event.target.result.fullname);
+                        }
                     } else {
                         alert('Senha incorreta!');
                     }
