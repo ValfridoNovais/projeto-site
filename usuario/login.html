@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Login e Registro</title>
+    <!-- Bootstrap CSS -->
+    <link href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="../Estilo/style.css">
+</head>
+<body>
+    <div class="container mt-5">
+        <div class="row justify-content-center">
+            <div class="col-md-6">
+                <div class="card">
+                    <div class="card-body">
+                        <form id="login-form" class="form">
+                            <h2 class="card-title text-center">Login</h2>
+                            <div class="form-group">
+                                <label for="login-username">Usuário</label>
+                                <input type="text" class="form-control" id="login-username" name="username" required>
+                            </div>
+                            <div class="form-group">
+                                <label for="login-password">Senha</label>
+                                <input type="password" class="form-control" id="login-password" name="password" required>
+                            </div>
+                            <button type="submit" class="btn btn-primary btn-block">Entrar</button>
+                        </form>
+                        <form id="register-form" class="form d-none">
+                            <h2 class="card-title text-center">Registro</h2>
+                            <div class="form-group">
+                                <label for="register-username">Usuário</label>
+                                <input type="text" class="form-control" id="register-username" name="username" required>
+                            </div>
+                            <div class="form-group">
+                                <label for="register-password">Senha</label>
+                                <input type="password" class="form-control" id="register-password" name="password" required>
+                            </div>
+                            <div class="form-group">
+                                <label for="register-email">Email</label>
+                                <input type="email" class="form-control" id="register-email" name="email" required>
+                            </div>
+                            <button type="submit" class="btn btn-primary btn-block">Registrar</button>
+                        </form>
+                        <div class="text-center mt-3">
+                            <p>Não tem uma conta? <a href="#" id="show-register">Registre-se aqui</a></p>
+                            <p>Já tem uma conta? <a href="#" id="show-login" class="d-none">Faça login aqui</a></p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!-- Bootstrap JS, Popper.js, and jQuery -->
+    <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.9.2/dist/umd/popper.min.js"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+    <script>
+        document.getElementById('show-register').addEventListener('click', function(event) {
+            event.preventDefault();
+            document.getElementById('login-form').classList.add('d-none');
+            document.getElementById('register-form').classList.remove('d-none');
+            document.getElementById('show-register').classList.add('d-none');
+            document.getElementById('show-login').classList.remove('d-none');
+        });
+
+        document.getElementById('show-login').addEventListener('click', function(event) {
+            event.preventDefault();
+            document.getElementById('login-form').classList.remove('d-none');
+            document.getElementById('register-form').classList.add('d-none');
+            document.getElementById('show-register').classList.remove('d-none');
+            document.getElementById('show-login').classList.add('d-none');
+        });
+    </script>
+</body>
+</html>
