@@ -30,9 +30,18 @@
 
         document.addEventListener('DOMContentLoaded', () => {
             let request = indexedDB.open(DB_NAME, DB_VERSION);
+            
+            request.onupgradeneeded = function(event) {
+                db = event.target.result;
+                if (!db.objectStoreNames.contains('users')) {
+                    db.createObjectStore('users', { keyPath: 'username' });
+                }
+                console.log('Database upgrade needed');
+            };
 
             request.onsuccess = function(event) {
                 db = event.target.result;
+                console.log('Database opened successfully');
                 loadUsers();
             };
 
@@ -49,6 +58,7 @@
             request.onsuccess = function(event) {
                 const users = event.target.result;
                 const userList = document.getElementById('user-list');
+                console.log('Users loaded:', users);
 
                 users.forEach(user => {
                     let row = userList.insertRow();
